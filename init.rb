@@ -11,7 +11,7 @@ class ActionController::Base
   # print reports at the end
   def process_with_benchmark_for_rails(*args, &block) #:nodoc:
     returning process_without_benchmark_for_rails(*args, &block) do
-      BenchmarkForRails.report
+      BenchmarkForRails.report(self)
       logger.flush if logger.respond_to? :flush
     end
   end
