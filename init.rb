@@ -4,7 +4,8 @@ BenchmarkForRails.watch("respond_to block", ActionController::MimeResponds::Inst
 BenchmarkForRails.watch("activerecord find", ActiveRecord::Base, :find, false)
 BenchmarkForRails.watch("before filters", ActionController::Filters::InstanceMethods, :run_before_filters)
 BenchmarkForRails.watch("after filters", ActionController::Filters::InstanceMethods, :run_after_filters)
-BenchmarkForRails.watch("session startup", CGI::Session, :initialize)
+BenchmarkForRails.watch("session management", CGI::Session, :initialize)
+BenchmarkForRails.watch("session management", ActionController::Base, :close_session)
 BenchmarkForRails.watch("rendering", ActionController::Base, :render)
 
 class ActionController::Base
