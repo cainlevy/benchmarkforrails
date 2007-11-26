@@ -1,6 +1,6 @@
 if RAILS_ENV == 'development'
 
-BenchmarkForRails.watch("request processing", ActionController::Base, :process)
+BenchmarkForRails.watch(:request, ActionController::Base, :process)
 BenchmarkForRails.watch("respond_to block", ActionController::MimeResponds::InstanceMethods, :respond_to)
 BenchmarkForRails.watch("activerecord find", ActiveRecord::Base, :find, false)
 BenchmarkForRails.watch("before filters", ActionController::Filters::InstanceMethods, :run_before_filters)
