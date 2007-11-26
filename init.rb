@@ -6,6 +6,7 @@ BenchmarkForRails.watch("activerecord find", ActiveRecord::Base, :find, false)
 BenchmarkForRails.watch("before filters", ActionController::Filters::InstanceMethods, :run_before_filters)
 BenchmarkForRails.watch("after filters", ActionController::Filters::InstanceMethods, :run_after_filters)
 BenchmarkForRails.watch("session startup", CGI::Session, :initialize)
+BenchmarkForRails.watch("rendering", ActionController::Base, :render)
 
 class ActionController::Base
   # print reports at the end
