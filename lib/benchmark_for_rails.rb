@@ -17,8 +17,6 @@ module BenchmarkForRails
     # * method: the name of the method to be benchmarked
     # * instance: whether the method is an instance method or not
     def watch(name, obj, method, instance = true)
-      results[name] ||= 0
-
       obj.class_eval <<-EOL
         #{"class << self" unless instance}
         def #{method}_with_better_benchmarks(*args, &block)
@@ -38,6 +36,7 @@ module BenchmarkForRails
     # method's return value
     def measure(name, &block)
       result = nil
+      self.results[name] ||= 0
       self.results[name] += Benchmark.measure{result = yield}.real
       result
     end
@@ -47,13 +46,13 @@ module BenchmarkForRails
     def report(controller)
       request_action = "#{controller.request.method.to_s.upcase} #{controller.controller_class_name}\##{controller.action_name}"
       request_time   = results.delete(:request)
-      logger.info "- [#{'%.4f' % request_time}] #{request_action} ".ljust(40, '-')
+      logger.info "- [#{'%.4f' % request_time}] #{request_action} ".ljust(50, '-')
 
       results.to_a.sort_by{|(name, seconds)| seconds}.reverse.each do |(name, seconds)|
         logger.info "   #{'%.4f' % seconds} #{name}"
       end
 
-      logger.info " BenchmarkForRails -".rjust(40, '-')
+      logger.info " BenchmarkForRails -".rjust(50, '-')
 
       results.clear
     end
