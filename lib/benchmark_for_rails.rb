@@ -41,22 +41,6 @@ module BenchmarkForRails
       result
     end
 
-    # Prints the benchmarks for the request into the log, with some
-    # basic ASCII formatting (yay).
-    def report(controller)
-      request_action = "#{controller.request.method.to_s.upcase} #{controller.controller_class_name}\##{controller.action_name}"
-      request_time   = results.delete(:request)
-      logger.info "- [#{'%.4f' % request_time}] #{request_action} ".ljust(50, '-')
-
-      results.to_a.sort_by{|(name, seconds)| seconds}.reverse.each do |(name, seconds)|
-        logger.info "   #{'%.4f' % seconds} #{name}"
-      end
-
-      logger.info " BenchmarkForRails -".rjust(50, '-')
-
-      results.clear
-    end
-
     def logger #:nodoc:
       RAILS_DEFAULT_LOGGER
     end
