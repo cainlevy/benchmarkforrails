@@ -19,11 +19,11 @@ module BenchmarkForRails
     def watch(name, obj, method, instance = true)
       obj.class_eval <<-EOL
         #{"class << self" unless instance}
-        def #{method}_with_better_benchmarks(*args, &block)
-          BenchmarkForRails.measure(#{name.inspect}) {#{method}_without_better_benchmarks(*args, &block)}
+        def #{method}_with_benchmark_for_rails(*args, &block)
+          BenchmarkForRails.measure(#{name.inspect}) {#{method}_without_benchmark_for_rails(*args, &block)}
         end
 
-        alias_method_chain :#{method}, :better_benchmarks
+        alias_method_chain :#{method}, :benchmark_for_rails
         #{"end" unless instance}
       EOL
     end
