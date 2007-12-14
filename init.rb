@@ -19,8 +19,8 @@ BenchmarkForRails.watch("session management", CGI::Session, :initialize)
 BenchmarkForRails.watch("session management", ActionController::Base, :close_session)
 
 # Controller filters
-BenchmarkForRails.watch("before filters", ActionController::Filters::InstanceMethods, :run_before_filters)
-BenchmarkForRails.watch("after filters", ActionController::Filters::InstanceMethods, :run_after_filters)
+BenchmarkForRails.watch("filters", ActionController::Filters::InstanceMethods, :run_before_filters)
+BenchmarkForRails.watch("filters", ActionController::Filters::InstanceMethods, :run_after_filters)
 
 # The real cost of database access should include query construction.
 # Hence why we try and watch the core finder. More watches might be added
