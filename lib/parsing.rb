@@ -26,8 +26,8 @@ module BenchmarkForRails
 
     # returns the slowest few ResourcePaths
     # optionally determines slowness by weighting speed vs frequency (e.g. total time, not average time)
-    def slowest(number = 10, weighted = false)
-      resource_paths.sort_by(&(weighted ? :total_time : :average_time)).reverse[0...number]
+    def slowest(number = 10, total_time = false)
+      resource_paths.sort_by(&(total_time ? :total_time : :average_time)).reverse[0...number]
     end
   end
 
