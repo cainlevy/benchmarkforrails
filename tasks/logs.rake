@@ -1,5 +1,10 @@
-require File.dirname(__FILE__) + '/../lib/parsing.rb'
-require File.dirname(__FILE__) + '/../lib/report.rb'
+# Bleh. Why isn't this already loaded? I need Symbol#& !
+require 'active_support'
+# Huh. It's as though autoloading doesn't work for rake tasks.
+require File.dirname(__FILE__) + '/../lib/benchmark_for_rails'
+require File.dirname(__FILE__) + '/../lib/benchmark_for_rails/report'
+require File.dirname(__FILE__) + '/../lib/benchmark_for_rails/log_parser'
+require File.dirname(__FILE__) + '/../lib/benchmark_for_rails/resource_path'
 
 namespace :log do
   desc "run reports on BenchmarkForRails log output. examples: `rake log:analyze path='GET /'`, or `rake log:analyze order_by=averages`"
