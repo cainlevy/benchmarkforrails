@@ -4,7 +4,7 @@ module BenchmarkForRails
     # basic ASCII formatting (yay). Uses a multi-line format for
     # development mode, and a one-line format for production mode.
     def report(request)
-      request_action = "#{request.method.to_s.upcase} #{request.path}"
+      request_action = "#{request.method.to_s.upcase} #{request.path.chomp('/')}"
       request_time   = results.delete(:request)
 
       if RAILS_ENV.to_sym == :production
