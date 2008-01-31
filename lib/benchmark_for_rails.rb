@@ -17,7 +17,7 @@ module BenchmarkForRails
     # * method: the name of the method to be benchmarked
     # * instance: whether the method is an instance method or not
     def watch(name, obj, method, instance = true)
-      obj.class_eval <<-EOL
+      obj.class_eval <<-EOL, __FILE__, __LINE__
         #{"class << self" unless instance}
         def #{method}_with_benchmark_for_rails(*args, &block)
           BenchmarkForRails.measure(#{name.inspect}) {#{method}_without_benchmark_for_rails(*args, &block)}
