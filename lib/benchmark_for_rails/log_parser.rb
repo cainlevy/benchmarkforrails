@@ -1,13 +1,55 @@
 module BenchmarkForRails
   class LogParser
+    # The log file to be read.
     attr_accessor :file
-    def initialize
-      self.file = RAILS_ROOT + '/log/production.log'
+
+    # If set to a Time, will limit the parsed responses to those *after*
+    # the threshold. This lets you parse the last hour's worth of data out
+    # of a log.
+    #
+    # Depends on the 'elif' gem.
+    attr_accessor :threshold
+
+    def initialize(file = nil, threshold = nil)
+      self.file = file || RAILS_ROOT + '/log/production.log'
+      self.threshold = threshold
     end
 
-    # pulls B4R lines out of the logfile
+    # pulls B4R lines out of the logfile.
     def lines
-      @lines ||= File.read(self.file).grep(/^B4R/)
+      if @lines.nil?
+        if threshold
+          @lines = []
+          Elif.foreach(self.file) do |line|
+            if line =~ /^B4R/
+              @lines << line
+            elsif threshold and line =~ /\AProcessing .+ at (\d+-\d+-\d+ \d+:\d+:\d+)\Z/
+              time_of_request = Time.parse($1)
+              @lines.pop and break if time_of_request < self.threshold
+            end
+          end
+        else
+          @lines ||= File.read(self.file).grep(/^B4R/)
+        end
+      end
+      @lines
+    end
+
+    # reads the resource_paths to calculate average times for *each* benchmark type.
+    # that is, this returns averages indexed by benchmark, not path.
+    def benchmarks
+      if @benchmarks.nil?
+        benchmarks = {}
+        resource_paths.each do |path|
+          path.requests.each do |request|
+            request.each do |benchmark, time| (benchmarks[benchmark] ||= []) << time end
+          end
+        end
+
+        @benchmarks = {}
+        benchmarks.each do |benchmark, times| @benchmarks[benchmark] = (times.sum || 0) / times.size end
+      end
+      @benchmarks
     end
 
     # pulls ResourcePath objects out of the file
