@@ -29,6 +29,14 @@ module BenchmarkForRails
       @average_time ||= total_time / frequency
     end
 
+    def min
+      @min ||= requests.collect{|r| r['request']}.min
+    end
+
+    def max
+      @max ||= requests.collect{|r| r['request']}.max
+    end
+
     def self.path_from(str)
       str.match(/\[(.*)\]/)[1]
     end
