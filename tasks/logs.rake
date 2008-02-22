@@ -9,7 +9,6 @@ require File.dirname(__FILE__) + '/../lib/benchmark_for_rails/resource_path'
 namespace :log do
   desc "run reports on BenchmarkForRails log output. examples: `rake log:analyze path='GET /'`, or `rake log:analyze order_by=averages`"
   task :analyze do
-r=Benchmark.measure{
     report = BenchmarkForRails::Report.new
     order_by_totals = !(ENV['order_by'] =~ /^averages?/)
     BenchmarkForRails::LogParser.new.slowest(10, order_by_totals).each do |resource_path|
@@ -22,7 +21,5 @@ r=Benchmark.measure{
       ]
     end
     report.render('resource path', 'total time', 'frequency', 'average', 'min - max')
-}.real
-p r
   end
 end

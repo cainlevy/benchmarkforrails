@@ -22,7 +22,7 @@ module BenchmarkForRails
     end
 
     def total_time
-      @total_time ||= requests.collect{|r| r['request']}.sum
+      @total_time ||= self['request'].sum
     end
 
     def average_time
@@ -30,15 +30,19 @@ module BenchmarkForRails
     end
 
     def min
-      @min ||= requests.collect{|r| r['request']}.min
+      @min ||= self['request'].min
     end
 
     def max
-      @max ||= requests.collect{|r| r['request']}.max
+      @max ||= self['request'].max
     end
 
     def self.path_from(str)
       str.match(/\[(.*)\]/)[1]
+    end
+
+    def [](benchmark_name)
+      requests.collect{|r| r[benchmark_name.to_s]}
     end
   end
 end
