@@ -16,16 +16,18 @@ module BenchmarkForRails
     end
 
     # pulls B4R lines out of the logfile.
+    B4R_RE        = /^B4R/
+    PROCESSING_RE = /\AProcessing .+ at (\d+-\d+-\d+ \d+:\d+:\d+)\Z/
     def lines
       if @lines.nil?
         if threshold
+          require 'elif'
           @lines = []
           Elif.foreach(self.file) do |line|
-            if line =~ /^B4R/
+            if B4R_RE.match(line)
               @lines << line
-            elsif threshold and line =~ /\AProcessing .+ at (\d+-\d+-\d+ \d+:\d+:\d+)\Z/
-              time_of_request = Time.parse($1)
-              @lines.pop and break if time_of_request < self.threshold
+            elsif threshold and PROCESSING_RE.match(line)
+              @lines.pop and break if Time.parse($1) < self.threshold
             end
           end
         else
@@ -74,6 +76,11 @@ module BenchmarkForRails
   end
 
   class ResourcePath
+    # pre-generate the regular expressions. this matters when you loop one million times.
+    PATH_STRIP_RE         = /.*\] */
+    MEASUREMENT_SPLIT_RE  = / *: */
+    PATH_RE               = /\[(.*?)\]/
+
     attr_reader :path
     attr_reader :requests
 
@@ -84,9 +91,9 @@ module BenchmarkForRails
 
     def add_request(line)
       measurements = {}
-      line.sub(/.*\]/, '').split(' | ').each do |measurement|
-        name, seconds = *measurement.split(':').collect{|p| p.strip}
-        measurements[name] = seconds.to_f
+      line.sub(PATH_STRIP_RE, '').split(' | ').each do |measurement|
+        md = MEASUREMENT_SPLIT_RE.match(measurement)
+        measurements[md.pre_match] = md.post_match.to_f
       end
       self.requests << measurements
     end
@@ -104,7 +111,7 @@ module BenchmarkForRails
     end
 
     def self.path_from(str)
-      str.match(/\[(.*)\]/)[1]
+      PATH_RE.match(str)[1]
     end
   end
 end
