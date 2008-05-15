@@ -31,6 +31,18 @@ class BenchmarkForRailsTest < Test::Unit::TestCase
     assert BenchmarkForRails.results['somnolence'] > 0.19
   end
 
+  # a test for measuring recursive functions
+  def test_nested_duplicate_measurements
+    BenchmarkForRails.measure('recursive') do
+      sleep 0.2
+      BenchmarkForRails.measure('recursive') do
+        sleep 0.2
+      end
+    end
+    assert BenchmarkForRails.results['recursive'] < 0.41
+    assert BenchmarkForRails.results['recursive'] > 0.39
+  end
+
   def test_watching_passes_blocks
     BenchmarkForRails.watch('yielding', BenchmarkForRails::SomeClass, :yielder)
     assert_equal 'christmas', BenchmarkForRails::SomeClass.new.yielder { 'christmas' }

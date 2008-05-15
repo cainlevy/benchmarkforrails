@@ -35,14 +35,30 @@ module BenchmarkForRails
     # Used by watch to record the time of a method call without losing the
     # method's return value
     def measure(name, &block)
-      result = nil
-      self.results[name] ||= 0
-      self.results[name] += Benchmark.measure{result = yield}.real
-      result
+      if self.running? name
+        yield
+      else
+        result = nil
+        self.results[name] ||= 0
+        self.running << name
+        self.results[name] += Benchmark.measure{result = yield}.real
+        self.running.delete(name)
+        result
+      end
     end
 
     def logger #:nodoc:
       RAILS_DEFAULT_LOGGER
+    end
+
+    protected
+
+    def running?(name)
+      running.include? name
+    end
+
+    def running
+      @running ||= []
     end
   end
 end
