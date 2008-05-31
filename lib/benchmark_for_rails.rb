@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/dependencies_patch'
+require File.dirname(__FILE__) + '/benchmark_for_rails/rewatching'
 
 # BenchmarkForRails addresses a few issues with ActionController's benchmarking:
 # * hidden query costs (ActiveRecord's cost of building a query)
@@ -19,6 +19,8 @@ module BenchmarkForRails
     # * method: the name of the method to be benchmarked
     # * instance: whether the method is an instance method or not
     def watch(name, obj, method, instance = true)
+      rewatchable(name, obj.to_s, method, instance) if Dependencies.will_unload?(obj)
+
       obj.class_eval <<-EOL, __FILE__, __LINE__
         #{"class << self" unless instance}
         def #{method}_with_benchmark_for_rails(*args, &block)

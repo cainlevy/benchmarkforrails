@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/test_helper'
-require 'benchmark_for_rails'
 
 class BenchmarkForRailsTest < Test::Unit::TestCase
 
@@ -77,5 +76,4 @@ class BenchmarkForRailsTest < Test::Unit::TestCase
     assert_equal 'bar', Some::Module.bar
     assert_not_nil BenchmarkForRails.results['module_class_method']
   end
-
 end
