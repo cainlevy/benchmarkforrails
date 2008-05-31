@@ -1,3 +1,5 @@
+require File.dirname(__FILE__) + '/dependencies_patch'
+
 # BenchmarkForRails addresses a few issues with ActionController's benchmarking:
 # * hidden query costs (ActiveRecord's cost of building a query)
 # * no visibility on the cost of before/after filters
