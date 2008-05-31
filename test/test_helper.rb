@@ -2,22 +2,11 @@ require 'test/unit'
 require 'benchmark'
 require 'rubygems'
 require 'active_support'
-$LOAD_PATH << File.dirname(__FILE__) + '/../lib/'
 
-module BenchmarkForRails
+# load the b4r module, but once
+lib_path = File.dirname(__FILE__) + '/../lib/'
+Dependencies.load_paths << lib_path
+Dependencies.load_once_paths << lib_path
 
-  module SomeModule
-    def foo; 'foo' end
-    def self.bar; 'bar' end
-  end
-
-  class SomeClass
-    include SomeModule
-    def hello; 'hello' end
-    def self.world; 'world' end
-    def yielder; yield end
-    def echoer(*args); args end
-  end
-
-end
-
+# for the fake application directory - needed to test reloading
+Dependencies.load_paths << File.dirname(__FILE__) + '/app/'
