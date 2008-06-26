@@ -10,7 +10,8 @@ BenchmarkForRails.watch("action", ActionController::Base, :perform_action)
 # Tries to give some perspective on how much time is tied up in reloading the
 # application for development mode.
 if RAILS_ENV == 'development'
-  BenchmarkForRails.watch("development mode", Dispatcher, :prepare_application)
+  BenchmarkForRails.watch("development mode", Dispatcher, :reload_application)
+  BenchmarkForRails.watch("development mode", Dispatcher, :cleanup_application)
 end
 
 # Session management is normally small, although sometimes it's still a
