@@ -19,7 +19,7 @@ module BenchmarkForRails
     # * method: the name of the method to be benchmarked
     # * instance: whether the method is an instance method or not
     def watch(name, obj, method, instance = true)
-      rewatchable(name, obj.to_s, method, instance) if Dependencies.will_unload?(obj)
+      rewatchable(name, obj.to_s, method, instance) if ActiveSupport::Dependencies.will_unload?(obj)
 
       obj.class_eval <<-EOL, __FILE__, __LINE__
         #{"class << self" unless instance}

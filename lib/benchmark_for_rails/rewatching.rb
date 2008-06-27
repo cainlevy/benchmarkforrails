@@ -19,22 +19,23 @@ module BenchmarkForRails
 end
 
 # hook into dependency unloading
-module Dependencies
-  class << self
-    def clear_with_rewatching(*args, &block)
-      returning clear_without_rewatching(*args, &block) do
-        BenchmarkForRails.rewatch!
+module ActiveSupport
+  module Dependencies
+    class << self
+      def clear_with_rewatching(*args, &block)
+        returning clear_without_rewatching(*args, &block) do
+          BenchmarkForRails.rewatch!
+        end
       end
+      alias_method_chain :clear, :rewatching
     end
-    alias_method_chain :clear, :rewatching
   end
 end
-
 # patch a typo bug in Dependencies
 begin
-  Dependencies.will_unload?(Array) # some already-loaded constant
+  ActiveSupport::Dependencies.will_unload?(Array) # some already-loaded constant
 rescue NameError
-  Dependencies.module_eval do
+  ActiveSupport::Dependencies.module_eval do
     def will_unload?(const_desc)
       # this was autoloaded?(desc), which is an undefined variable
       autoloaded?(const_desc) ||
