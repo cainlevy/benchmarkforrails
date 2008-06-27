@@ -19,6 +19,7 @@ module BenchmarkForRails
 end
 
 # hook into dependency unloading
+ActiveSupport::Dependencies = Dependencies unless ActiveSupport.const_defined?("Dependencies") # compat for Rails <= 2.1
 module ActiveSupport
   module Dependencies
     class << self
@@ -31,6 +32,7 @@ module ActiveSupport
     end
   end
 end
+
 # patch a typo bug in Dependencies
 begin
   ActiveSupport::Dependencies.will_unload?(Array) # some already-loaded constant
