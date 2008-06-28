@@ -20,8 +20,11 @@ BenchmarkForRails.watch("session", CGI::Session, :initialize)
 BenchmarkForRails.watch("session", ActionController::Base, :close_session)
 
 # Controller filters
-BenchmarkForRails.watch("filters", ActionController::Filters::InstanceMethods, :run_before_filters)
-BenchmarkForRails.watch("filters", ActionController::Filters::InstanceMethods, :run_after_filters)
+# Note that AroundFilters can not be timed independently of the action itself, since they
+# yield the action itself. This makes for something of a blind spot in the "filters"
+# benchmark, but it at least keeps the "filters" benchmark meaningful.
+BenchmarkForRails.watch("filters", ActionController::Filters::BeforeFilter, :call)
+BenchmarkForRails.watch("filters", ActionController::Filters::AfterFilter, :call)
 
 # The real cost of database access should include query construction.
 # Hence why we try and watch the core finder. More watches might be added
