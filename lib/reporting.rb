@@ -5,7 +5,7 @@ module BenchmarkForRails
     # development mode, and a one-line format for production mode.
     def report(request)
       request_action = "#{request.method.to_s.upcase} #{request.path.chomp('/')}"
-      request_time   = results.delete(:request)
+      request_time   = results.delete(:request) || 0.0
 
       if RAILS_ENV.to_sym == :production
         # in production mode, we want to use a one-line format that makes it easy to
