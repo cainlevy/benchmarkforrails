@@ -33,7 +33,7 @@ module BenchmarkForRails
     end
 
     def results #:nodoc:
-      @results ||= {}
+      Thread.current[:results] ||= Hash.new(0)
     end
 
     # Used by watch to record the time of a method call without losing the
@@ -43,16 +43,20 @@ module BenchmarkForRails
         yield
       else
         result = nil
-        self.results[name] ||= 0
         self.running << name
-        self.results[name] += Benchmark.measure{result = yield}.real
-        self.running.delete(name)
+        begin
+          self.results[name] += Benchmark.ms{result = yield} / 1000
+        rescue
+          raise
+        ensure
+          self.running.delete(name)
+        end
         result
       end
     end
 
     def logger #:nodoc:
-      RAILS_DEFAULT_LOGGER
+      Rails.logger
     end
 
     protected
@@ -62,7 +66,7 @@ module BenchmarkForRails
     end
 
     def running
-      @running ||= []
+      Thread.current[:running] ||= []
     end
   end
 end

@@ -31,13 +31,13 @@ module BenchmarkForRails
   end
 end
 
-class ::Dispatcher
+class ActionController::Dispatcher
   # print reports at the end
-  def dispatch_with_benchmark_for_rails_reporting(*args, &block) #:nodoc:
-    returning dispatch_without_benchmark_for_rails_reporting(*args, &block) do
-      BenchmarkForRails.report(@request)
-      RAILS_DEFAULT_LOGGER.flush if RAILS_DEFAULT_LOGGER.respond_to? :flush
+  def call_with_benchmark_for_rails_reporting(*args, &block) #:nodoc:
+    returning call_without_benchmark_for_rails_reporting(*args, &block) do |status, headers, response|
+      BenchmarkForRails.report(ActionController::Request.new(args.first))
+      Rails.logger.flush if Rails.logger.respond_to? :flush
     end
   end
-  alias_method_chain :dispatch, :benchmark_for_rails_reporting
+  alias_method_chain :call, :benchmark_for_rails_reporting
 end

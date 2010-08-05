@@ -1,39 +1,31 @@
-require 'dispatcher'
-# The special :request benchmark. This tries to encompass everything that runs
-# to handle a request.
-BenchmarkForRails.watch(:request, ::Dispatcher, :dispatch)
-
-# Processing the action itself (calling the controller method)
-# This is what Rails' default benchmarks claim is the response time.
-BenchmarkForRails.watch("action", ActionController::Base, :perform_action)
-
-# Tries to give some perspective on how much time is tied up in reloading the
-# application for development mode.
-if RAILS_ENV == 'development'
-  BenchmarkForRails.watch("development mode", Dispatcher, :reload_application)
-  BenchmarkForRails.watch("development mode", Dispatcher, :cleanup_application)
-end
-
-# Session management is normally small, although sometimes it's still a
-# significant percentage.
-BenchmarkForRails.watch("session", CGI::Session, :initialize)
-BenchmarkForRails.watch("session", ActionController::Base, :close_session)
-
-# Controller filters
-# Note that AroundFilters can not be timed independently of the action itself, since they
-# yield the action itself. This makes for something of a blind spot in the "filters"
-# benchmark, but it at least keeps the "filters" benchmark meaningful.
-BenchmarkForRails.watch("filters", ActionController::Filters::BeforeFilter, :call)
-BenchmarkForRails.watch("filters", ActionController::Filters::AfterFilter, :call)
+# The indentation of this benchmark tree indicates which benchmarks include which other benchmarks.
+# For example, :request = :reloading + :dispatch + ?
+# And, :dispatch = :routing + :process + ?
+BenchmarkForRails.watch(:request, ActionController::Dispatcher, :call)
+  BenchmarkForRails.watch("reloading", ActionController::Dispatcher, :reload_application, false) if RAILS_ENV == 'development'
+  # this runs after all the middleware
+  BenchmarkForRails.watch('dispatch', ActionController::Dispatcher, :_call)
+    BenchmarkForRails.watch('routing', ActionController::Routing::RouteSet, :recognize)
+    BenchmarkForRails.watch('sass', Sass::Plugin, :check_for_updates) if defined? Sass
+    BenchmarkForRails.watch('process', ActionController::Base, :process)
+      BenchmarkForRails.watch("filters", ActionController::Filters::BeforeFilter, :call)
+      # Processing the action itself (calling the controller method)
+      # This is what Rails' default benchmarks claim is the response time.
+      BenchmarkForRails.watch("action", ActionController::Base, :perform_action)
+        # And yes, it's still important to know how much time is spent rendering.
+        BenchmarkForRails.watch("rendering", ActionController::Base, :render)
+      BenchmarkForRails.watch("filters", ActionController::Filters::AfterFilter, :call)
+  # TODO: this happens at the *end* of a request, after the middleware stack and definitely
+  # after reporting. so these times get attributed to the *next* request. too confusing.
+  # BenchmarkForRails.watch("reloading", ActionController::Dispatcher, :cleanup_application, false) if RAILS_ENV == 'development'
 
 # The real cost of database access should include query construction.
 # Hence why we try and watch the core finder. More watches might be added
 # to this group to form a more complete picture of database access. The
 # question is simply which methods bypass find().
-BenchmarkForRails.watch("finders", ActiveRecord::Base, :find, false)
-
-# And yes, it's still important to know how much time is spent rendering.
-BenchmarkForRails.watch("rendering", ActionController::Base, :render)
+# TODO: disabling this until it can be more comprehensive.
+# BenchmarkForRails.watch("queries", ActiveRecord::Base, :find, false)
+# BenchmarkForRails.watch("queries", ActiveRecord::Base, :find_by_sql, false)
 
 # Should be included after the BenchmarkForRails.watch(:request, ...),
 # since it hooks into the same method.
