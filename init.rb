@@ -6,7 +6,6 @@ BenchmarkForRails.watch(:request, ActionController::Dispatcher, :call)
   # this runs after all the middleware
   BenchmarkForRails.watch('dispatch', ActionController::Dispatcher, :_call)
     BenchmarkForRails.watch('routing', ActionController::Routing::RouteSet, :recognize)
-    BenchmarkForRails.watch('sass', Sass::Plugin, :check_for_updates) if defined? Sass
     BenchmarkForRails.watch('process', ActionController::Base, :process)
       BenchmarkForRails.watch("filters", ActionController::Filters::BeforeFilter, :call)
       # Processing the action itself (calling the controller method)
