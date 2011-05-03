@@ -34,7 +34,7 @@ end
 class ActionController::Dispatcher
   # print reports at the end
   def call_with_benchmark_for_rails_reporting(*args, &block) #:nodoc:
-    returning call_without_benchmark_for_rails_reporting(*args, &block) do |status, headers, response|
+    call_without_benchmark_for_rails_reporting(*args, &block).tap do |status, headers, response|
       BenchmarkForRails.report(ActionController::Request.new(args.first))
       Rails.logger.flush if Rails.logger.respond_to? :flush
     end

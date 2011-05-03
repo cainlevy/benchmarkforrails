@@ -22,7 +22,7 @@ end
 module ActiveSupport::Dependencies
   class << self
     def clear_with_rewatching(*args, &block)
-      returning clear_without_rewatching(*args, &block) do
+      clear_without_rewatching(*args, &block).tap do
         BenchmarkForRails.rewatch!
       end
       alias_method_chain :clear, :rewatching
